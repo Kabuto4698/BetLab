@@ -17,35 +17,76 @@ class Database:
     def create_tables(self):
 
         self.cursor.execute("""
+        CREATE TABLE IF NOT EXISTS sessions(
+
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+
+            started_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+            ended_at TIMESTAMP,
+
+            starting_bankroll INTEGER DEFAULT 0,
+
+            ending_bankroll INTEGER DEFAULT 0,
+
+            profit INTEGER DEFAULT 0
+
+        )
+        """)
+
+        self.cursor.execute("""
         CREATE TABLE IF NOT EXISTS races(
 
             id INTEGER PRIMARY KEY AUTOINCREMENT,
 
-            winner TEXT NOT NULL,
+            session_id INTEGER,
+
+            winner TEXT,
 
             gap_before INTEGER,
 
             gap_after INTEGER,
 
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+            FOREIGN KEY(session_id) REFERENCES sessions(id)
 
         )
         """)
 
         self.connection.commit()
 
-    def save_race(self, winner, gap_before, gap_after):
+    def create_session(self):
+
+        self.cursor.execute("""
+        INSERT INTO sessions(starting_bankroll)
+        VALUES(0)
+        """)
+
+        self.connection.commit()
+
+        return self.cursor.lastrowid
+
+    def save_race(
+        self,
+        session_id,
+        winner,
+        gap_before,
+        gap_after,
+    ):
 
         self.cursor.execute(
             """
             INSERT INTO races(
+                session_id,
                 winner,
                 gap_before,
                 gap_after
             )
-            VALUES(?,?,?)
+            VALUES(?,?,?,?)
             """,
             (
+                session_id,
                 winner,
                 gap_before,
                 gap_after,
@@ -53,3 +94,43 @@ class Database:
         )
 
         self.connection.commit()
+
+    def get_session_races(self, session_id):
+
+        self.cursor.execute(
+            """
+            SELECT winner
+            FROM races
+            WHERE session_id=?
+            ORDER BY id
+            """,
+            (session_id,)
+        )
+
+        return [row[0] for row in self.cursor.fetchall()]
+
+
+    def delete_last_race(self, session_id):
+
+        self.cursor.execute(
+            """
+            DELETE FROM races
+            WHERE id = (
+
+                SELECT id
+
+                FROM races
+
+                WHERE session_id=?
+
+                ORDER BY id DESC
+
+                LIMIT 1
+
+            )
+            """,
+            (session_id,)
+        )
+
+        self.connection.commit()
+        

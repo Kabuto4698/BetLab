@@ -10,9 +10,11 @@ def main():
 
     db = Database()
 
+    session_id = db.create_session()
+
     app = QApplication(sys.argv)
 
-    window = Dashboard(db)
+    window = Dashboard(db, session_id)
 
     window.show()
 

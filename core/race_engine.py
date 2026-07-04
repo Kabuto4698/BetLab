@@ -1,20 +1,32 @@
+from core.history import History
+
+
 class RaceEngine:
 
     def __init__(self):
+
+        self.history = History()
+
         self.reset()
 
     def reset(self):
+
         self.race_number = 1
+
         self.current_gap = 0
 
         self.drought = {
             "P": 0,
             "M": 0,
             "ML": 0,
-            "L": 0,
+            "L": 0
         }
 
+        self.history.clear()
+
     def add_race(self, winner):
+
+        self.history.add(winner)
 
         self.race_number += 1
 
