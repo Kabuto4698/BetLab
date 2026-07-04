@@ -10,9 +10,11 @@ from core.race_engine import RaceEngine
 
 class Dashboard(QWidget):
 
-    def __init__(self):
+    def __init__(self, database):
 
         super().__init__()
+    
+        self.database = database
 
         self.engine = RaceEngine()
 
