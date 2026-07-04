@@ -33,3 +33,23 @@ class Database:
         """)
 
         self.connection.commit()
+
+    def save_race(self, winner, gap_before, gap_after):
+
+        self.cursor.execute(
+            """
+            INSERT INTO races(
+                winner,
+                gap_before,
+                gap_after
+            )
+            VALUES(?,?,?)
+            """,
+            (
+                winner,
+                gap_before,
+                gap_after,
+            ),
+        )
+
+        self.connection.commit()

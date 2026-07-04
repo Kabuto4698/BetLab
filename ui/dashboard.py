@@ -6,6 +6,7 @@ from PySide6.QtWidgets import (
 )
 
 from core.race_engine import RaceEngine
+from core.strategy_engine import StrategyEngine
 
 
 class Dashboard(QWidget):
@@ -17,6 +18,8 @@ class Dashboard(QWidget):
         self.database = database
 
         self.engine = RaceEngine()
+
+        self.strategy = StrategyEngine()
 
         self.setWindowTitle("BetLab")
 
@@ -32,6 +35,9 @@ class Dashboard(QWidget):
 
         self.gap_label = QLabel()
         self.layout.addWidget(self.gap_label)
+
+        self.recommendation_label = QLabel()
+        self.layout.addWidget(self.recommendation_label)
 
         self.p_label = QLabel()
         self.layout.addWidget(self.p_label)
@@ -69,7 +75,17 @@ class Dashboard(QWidget):
 
     def log(self, winner):
 
+        gap_before = self.engine.current_gap
+
         self.engine.add_race(winner)
+
+        gap_after = self.engine.current_gap
+
+        self.database.save_race(
+            winner,
+            gap_before,
+            gap_after
+        )
 
         self.refresh()
 
@@ -79,6 +95,14 @@ class Dashboard(QWidget):
 
         self.gap_label.setText(
             f"Current Gap: {self.engine.current_gap}"
+        )
+
+        recommendation = self.strategy.get_recommendation(
+            self.engine.current_gap
+        )
+
+        self.recommendation_label.setText(
+            f"Recommendation:\n\n{recommendation}"
         )
 
         self.p_label.setText(
