@@ -2,21 +2,27 @@ import sys
 
 from PySide6.QtWidgets import QApplication
 
-from ui.dashboard import Dashboard
 from core.database import Database
+from core.strategy_engine import StrategyEngine
 
+from ui.session_setup import SessionSetup
 
 def main():
 
-    db = Database()
-
-    session_id = db.create_session()
-
     app = QApplication(sys.argv)
 
-    window = Dashboard(db, session_id)
+    db = Database()
 
-    window.show()
+    strategy_engine = StrategyEngine()
+
+    session_setup = SessionSetup(
+    db,
+    strategy_engine.available_strategies()
+    )
+
+    session_setup.show()
+
+    print("Showing Session Setup...")
 
     sys.exit(app.exec())
 

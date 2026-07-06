@@ -1,24 +1,78 @@
+import json
+from pathlib import Path
+
+
 class StrategyEngine:
 
     def __init__(self):
-        self.current_strategy = "C1"
 
-    def get_recommendation(self, gap):
+        Path("strategies").mkdir(exist_ok=True)
 
-        if self.current_strategy == "C1":
+        self.strategy_name = "C1"
 
-            if gap <= 3:
-                return "NO BET"
+        self.strategy = {}
 
-            elif gap <= 7:
-                return (
-                    "Porsche 60\n"
-                    "Mercedes 40\n"
-                    "McLaren 20\n"
-                    "Lamborghini 20"
-                )
+        self.load(self.strategy_name)
 
-            else:
-                return "5× 100"
+    def load(self, name):
 
-        return "NO STRATEGY"
+        filename = Path("strategies") / f"{name}.json"
+
+        if not filename.exists():
+
+            self.strategy = {
+                "name": name,
+                "rules": []
+            }
+
+            return
+
+        with open(filename, "r", encoding="utf-8") as f:
+            self.strategy = json.load(f)
+
+        self.strategy_name = name
+
+    def get_recommendation(self, gap, drought):
+
+        for rule in self.strategy["rules"]:
+
+            # ---------- Gap ----------
+
+            if not (rule["gap_min"] <= gap <= rule["gap_max"]):
+                continue
+
+            # ---------- Drought ----------
+
+            if "drought" in rule:
+
+                valid = True
+
+                for car, minimum in rule["drought"].items():
+
+                    if drought[car] < minimum:
+                        valid = False
+                        break
+
+                if not valid:
+                    continue
+
+            return rule["bets"]
+
+        return {
+            "5": 0,
+            "P": 0,
+            "M": 0,
+            "ML": 0,
+            "L": 0
+        }
+
+    def available_strategies(self):
+
+        names = []
+
+        for file in Path("strategies").glob("*.json"):
+            names.append(file.stem)
+
+        names.sort()
+
+        return names

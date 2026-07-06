@@ -1,3 +1,7 @@
+print("Dashboard Loaded")
+
+print("Session Setup Loaded")
+
 import config
 
 from PySide6.QtWidgets import (
@@ -5,6 +9,7 @@ from PySide6.QtWidgets import (
     QVBoxLayout,
     QLabel,
     QPushButton,
+    QComboBox,
 )
 
 from PySide6.QtGui import QShortcut, QKeySequence
@@ -14,20 +19,43 @@ from core.strategy_engine import StrategyEngine
 
 class Dashboard(QWidget):
 
-    def __init__(self, database, session_id):
+    def __init__(
+        self,
+        database,
+        session_id,
+        engine,
+        finance,
+    ):
 
         super().__init__()
 
         self.database = database
         self.session_id = session_id
 
-        self.engine = RaceEngine()
+        self.engine = engine
+        self.finance = finance
         self.strategy = StrategyEngine()
 
         self.setWindowTitle("BetLab")
         self.resize(500, 700)
 
         self.layout = QVBoxLayout()
+
+        self.strategy_dropdown = QComboBox()
+
+        self.strategy_dropdown.addItems(
+        self.strategy.available_strategies()
+        )
+
+        self.strategy_dropdown.setCurrentText(
+        self.strategy.strategy_name
+        )
+
+        self.strategy_dropdown.currentTextChanged.connect(
+        self.change_strategy
+        )
+
+        self.layout.addWidget(self.strategy_dropdown)
 
         self.title = QLabel("🎰 BetLab")
         self.layout.addWidget(self.title)
@@ -40,6 +68,18 @@ class Dashboard(QWidget):
 
         self.recommendation_label = QLabel()
         self.layout.addWidget(self.recommendation_label)
+
+        self.total_stake_label = QLabel()
+        self.layout.addWidget(self.total_stake_label)
+
+        self.balance_label = QLabel()
+        self.layout.addWidget(self.balance_label)
+
+        self.session_profit_label = QLabel()
+        self.layout.addWidget(self.session_profit_label)
+
+        self.last_result_label = QLabel()
+        self.layout.addWidget(self.last_result_label)
 
         # ---------- HISTORY ----------
         self.history_label = QLabel()
@@ -115,6 +155,16 @@ class Dashboard(QWidget):
 
         gap_before = self.engine.current_gap
 
+        recommendation = self.strategy.get_recommendation(
+            gap_before,
+            self.engine.drought
+        )
+
+        self.finance.settle_bet(
+            recommendation,
+            winner
+        )
+
         self.engine.add_race(winner)
 
         gap_after = self.engine.current_gap
@@ -152,6 +202,12 @@ class Dashboard(QWidget):
 
         self.refresh()
 
+    def change_strategy(self, strategy_name):
+
+        self.strategy.load(strategy_name)
+
+        self.refresh()
+    
     def refresh(self):
 
         self.race_label.setText(
@@ -163,11 +219,44 @@ class Dashboard(QWidget):
         )
 
         recommendation = self.strategy.get_recommendation(
-            self.engine.current_gap
+        self.engine.current_gap,
+        self.engine.drought 
         )
 
+        stake = self.finance.total_stake(
+            recommendation
+        )
+
+        self.total_stake_label.setText(
+            f"Total Stake: {stake}"
+        )
+
+        self.balance_label.setText(
+            f"Balance: {self.finance.current_balance}"
+        )   
+
+        self.session_profit_label.setText(
+            f"Session P/L: {self.finance.session_profit()}"
+        )
+
+        self.last_result_label.setText(
+            f"Last Result: {self.finance.last_result}"  
+        )
+
+        text = ""
+
+        for bet, amount in recommendation.items():
+
+            if amount > 0:
+
+                text += f"{bet}: {amount}\n"
+
+        if text == "":
+
+            text = "No Bet"
+
         self.recommendation_label.setText(
-            f"Recommendation\n\n{recommendation}"
+            f"Strategy: {self.strategy.strategy_name}\n\n{text}"
         )
 
         self.p_label.setText(
