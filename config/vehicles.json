@@ -1,0 +1,26 @@
+{
+    "5": {
+        "count": 4,
+        "multiplier": 5
+    },
+
+    "P": {
+        "count": 1,
+        "multiplier": 10
+    },
+
+    "M": {
+        "count": 1,
+        "multiplier": 15
+    },
+
+    "ML": {
+        "count": 1,
+        "multiplier": 25
+    },
+
+    "L": {
+        "count": 1,
+        "multiplier": 45
+    }
+}
