@@ -1,5 +1,6 @@
 import json
 from pathlib import Path
+from core.rule_engine import RuleEngine
 
 
 class StrategyEngine:
@@ -11,6 +12,8 @@ class StrategyEngine:
         self.strategy_name = "C1"
 
         self.strategy = {}
+
+        self.rule_engine = RuleEngine()
 
         self.load(self.strategy_name)
 
@@ -32,39 +35,12 @@ class StrategyEngine:
 
         self.strategy_name = name
 
-    def get_recommendation(self, gap, drought):
+    def get_recommendation(self, engine):
 
-        for rule in self.strategy["rules"]:
-
-            # ---------- Gap ----------
-
-            if not (rule["gap_min"] <= gap <= rule["gap_max"]):
-                continue
-
-            # ---------- Drought ----------
-
-            if "drought" in rule:
-
-                valid = True
-
-                for car, minimum in rule["drought"].items():
-
-                    if drought[car] < minimum:
-                        valid = False
-                        break
-
-                if not valid:
-                    continue
-
-            return rule["bets"]
-
-        return {
-            "5": 0,
-            "P": 0,
-            "M": 0,
-            "ML": 0,
-            "L": 0
-        }
+        return self.rule_engine.get_recommendation(
+            self.strategy,
+            engine
+        )
 
     def available_strategies(self):
 

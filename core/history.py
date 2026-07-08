@@ -43,3 +43,18 @@ class History:
             return self.icons()
 
         return self.numbers() + "\n\n" + self.icons()
+
+    def last(self):
+
+        if not self.results:
+            return None
+
+        return self.results[-1]
+
+
+    def previous(self):
+
+        if len(self.results) < 2:
+            return None
+
+        return self.results[-2]

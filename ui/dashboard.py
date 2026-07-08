@@ -156,8 +156,7 @@ class Dashboard(QWidget):
         gap_before = self.engine.current_gap
 
         recommendation = self.strategy.get_recommendation(
-            gap_before,
-            self.engine.drought
+            self.engine
         )
 
         self.finance.settle_bet(
@@ -219,8 +218,7 @@ class Dashboard(QWidget):
         )
 
         recommendation = self.strategy.get_recommendation(
-        self.engine.current_gap,
-        self.engine.drought 
+        self.engine
         )
 
         stake = self.finance.total_stake(

@@ -6,23 +6,43 @@
         {
             "name": "5x",
 
-            "gap_min": 4,
-            "gap_max": 7,
+            "logic": "AND",
+
+            "conditions": [
+
+                {
+                    "type": "gap",
+                    "min": 4,
+                    "max": 7
+                }
+
+            ],
 
             "bets": {
                 "5": 100
             }
-        }   
+        },
 
         {
             "name": "Porsche",
 
-            "gap_min": 4,
-            "gap_max": 7,
+            "logic": "AND",
 
-            "drought": {
-                "P": 10
-            },
+            "conditions": [
+
+                {
+                    "type": "gap",
+                    "min": 4,
+                    "max": 7
+                },
+
+                {
+                    "type": "drought",
+                    "target": "P",
+                    "min": 10
+                }
+
+            ],
 
             "bets": {
                 "P": 60
@@ -30,14 +50,45 @@
         },
 
         {
+            "name": "Porsche Bonus",
+
+            "logic": "AND",
+
+            "conditions": [
+
+                {
+                    "type": "gap",
+                    "min": 4,
+                    "max": 7
+                }
+
+                ],
+
+                "bets": {
+                    "P": 10
+                }
+        },
+
+        {
             "name": "Mercedes",
 
-            "gap_min": 4,
-            "gap_max": 7,
+            "logic": "AND",
 
-            "drought": {
-                "M": 15
-            },
+            "conditions": [
+
+                {
+                    "type": "gap",
+                    "min": 4,
+                    "max": 7
+                },
+
+                {
+                    "type": "drought",
+                    "target": "M",
+                    "min": 15
+                }
+
+            ],
 
             "bets": {
                 "M": 40
@@ -47,12 +98,23 @@
         {
             "name": "McLaren",
 
-            "gap_min": 4,
-            "gap_max": 7,
+            "logic": "AND",
 
-            "drought": {
-                "ML": 40
-            },
+            "conditions": [
+
+                {
+                    "type": "gap",
+                    "min": 4,
+                    "max": 7
+                },
+
+                {
+                    "type": "drought",
+                    "target": "ML",
+                    "min": 40
+                }
+
+            ],
 
             "bets": {
                 "ML": 20
@@ -62,12 +124,23 @@
         {
             "name": "Lamborghini",
 
-            "gap_min": 4,
-            "gap_max": 7,
+            "logic": "AND",
 
-            "drought": {
-                "L": 120
-            },
+            "conditions": [
+
+                {
+                    "type": "gap",
+                    "min": 4,
+                    "max": 7
+                },
+
+                {
+                    "type": "drought",
+                    "target": "L",
+                    "min": 120
+                }
+
+            ],
 
             "bets": {
                 "L": 20

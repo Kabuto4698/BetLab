@@ -78,3 +78,18 @@ class RaceEngine:
                     self.drought[car] = 0
                 else:
                     self.drought[car] += 1
+                    
+    def last(self):
+
+        if not self.results:
+            return None
+
+        return self.results[-1]
+
+
+    def previous(self):
+
+        if len(self.results) < 2:
+            return None
+
+        return self.results[-2]
