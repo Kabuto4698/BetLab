@@ -155,16 +155,26 @@ class Dashboard(QWidget):
 
         gap_before = self.engine.current_gap
 
-        recommendation = self.strategy.get_recommendation(
-            self.engine
-        )
+        recommendation = self.strategy.current_recommendation()
 
         self.finance.settle_bet(
-            recommendation,
+            recommendation.bets,
             winner
         )
 
+        self.strategy.settle_rules(
+            winner
+        )
+
+        self.strategy.save_statistics(
+            self.database
+        )   
+
         self.engine.add_race(winner)
+
+        self.strategy.generate_recommendation(
+            self.engine
+        )   
 
         gap_after = self.engine.current_gap
 
@@ -175,6 +185,12 @@ class Dashboard(QWidget):
             gap_after
         )
 
+        print(self.strategy.statistics.summary())
+
+        print(
+            self.database.get_strategy_statistics()
+            )
+    
         self.refresh()
     
     def undo(self):
@@ -217,12 +233,16 @@ class Dashboard(QWidget):
             f"Current Gap: {self.engine.current_gap}"
         )
 
-        recommendation = self.strategy.get_recommendation(
-        self.engine
-        )
+        recommendation = self.strategy.current_recommendation()
+
+        if recommendation is None:
+
+            recommendation = self.strategy.generate_recommendation(
+                self.engine
+            )
 
         stake = self.finance.total_stake(
-            recommendation
+            recommendation.bets
         )
 
         self.total_stake_label.setText(
@@ -243,7 +263,7 @@ class Dashboard(QWidget):
 
         text = ""
 
-        for bet, amount in recommendation.items():
+        for bet, amount in recommendation.bets.items():
 
             if amount > 0:
 

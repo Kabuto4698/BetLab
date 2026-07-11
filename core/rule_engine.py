@@ -1,4 +1,5 @@
 from core.conditions import HANDLERS
+from core.recommendation import Recommendation
 
 
 class RuleEngine:
@@ -53,12 +54,30 @@ class RuleEngine:
 
         }
 
+        triggered_rules = []
+
         for rule in strategy["rules"]:
 
             if self.evaluate_rule(rule, engine):
+
+                triggered_rules.append(
+                    rule
+                )
 
                 for vehicle, amount in rule["bets"].items():
 
                     recommendation[vehicle] += amount
 
-        return recommendation
+        return Recommendation(
+
+            bets=recommendation,
+
+            triggered_rules=triggered_rules,
+
+            race_number=engine.race_number,
+
+            gap=engine.current_gap,
+
+            drought=engine.drought.copy()
+
+        )

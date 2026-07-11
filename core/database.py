@@ -54,6 +54,29 @@ class Database:
         )
         """)
 
+        self.cursor.execute("""
+        CREATE TABLE IF NOT EXISTS strategy_statistics(
+
+            strategy_name TEXT,
+
+            rule_name TEXT,
+
+            triggers INTEGER DEFAULT 0,
+
+            wins INTEGER DEFAULT 0,
+
+            losses INTEGER DEFAULT 0,
+
+            last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                            
+            PRIMARY KEY (
+                strategy_name,
+                rule_name
+            )
+
+        )
+        """)                   
+
         self.connection.commit()
 
     def create_session(self):
@@ -133,4 +156,57 @@ class Database:
         )
 
         self.connection.commit()
+
+    def save_strategy_statistic(
+        self,
+        strategy_name,
+        rule_name,
+        triggers,
+        wins,
+        losses
+    ):
+
+        self.cursor.execute("""
+        INSERT INTO strategy_statistics(
+            strategy_name,
+            rule_name,
+            triggers,
+            wins,
+            losses,
+            last_updated
+        )
+        VALUES(
+            ?, ?, ?, ?, ?, CURRENT_TIMESTAMP
+        )
+        ON CONFLICT(strategy_name, rule_name)
+        DO UPDATE SET
+
+            triggers = excluded.triggers,
+            wins = excluded.wins,
+            losses = excluded.losses,
+            last_updated = CURRENT_TIMESTAMP
+
+        """, (
+
+            strategy_name,
+            rule_name,
+            triggers,
+            wins,
+            losses
+
+        ))
+
+        self.connection.commit()
+
+    def get_strategy_statistics(self):
+
+        self.cursor.execute("""
+
+            SELECT *
+
+            FROM strategy_statistics
+
+        """)
+
+        return self.cursor.fetchall()
         
